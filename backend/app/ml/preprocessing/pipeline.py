@@ -143,32 +143,57 @@ class PreprocessingPipeline:
                 cat_imputer = SimpleImputer(strategy="most_frequent")
                 df_work[cat_cols] = cat_imputer.fit_transform(df_work[cat_cols])
                 
-        # 5. Categorical encoding
+        # 5. Categorical encoding & Text Embedding
         cat_cols = df_work.select_dtypes(exclude=[np.number]).columns.tolist()
         num_cols = df_work.select_dtypes(include=[np.number]).columns.tolist()
         encoded_column_names = []
-        
         encoded_arrays = []
+        
         if num_cols:
             encoded_arrays.append(df_work[num_cols].values)
             encoded_column_names.extend(num_cols)
             
-        if cat_cols and self.categorical_encoding != "none":
+        # Separate high-cardinality IDs, free-text sentences, and discrete categories
+        id_cols = []
+        text_cols = []
+        discrete_cat_cols = []
+        
+        for c in cat_cols:
+            s = df_work[c].astype(str)
+            avg_len = s.str.len().mean()
+            nunique = s.nunique()
+            if avg_len > 25 or c.lower() in ["text", "description", "content", "sentence", "abstract"]:
+                text_cols.append(c)
+            elif nunique == len(df_work) or (c.lower().endswith("_id") and nunique > 50):
+                id_cols.append(c)
+            else:
+                discrete_cat_cols.append(c)
+                
+        # Handle free-text columns with TF-IDF semantic embeddings (e.g., in AEMA research fact corpus)
+        for tc in text_cols:
+            try:
+                from sklearn.feature_extraction.text import TfidfVectorizer
+                tfidf = TfidfVectorizer(max_features=25, stop_words="english")
+                tfidf_mat = tfidf.fit_transform(df_work[tc].astype(str)).toarray()
+                feature_names_tfidf = [f"tfidf_{tc}_{w}" for w in tfidf.get_feature_names_out()]
+                encoded_arrays.append(tfidf_mat)
+                encoded_column_names.extend(feature_names_tfidf)
+            except Exception:
+                pass
+
+        if discrete_cat_cols and self.categorical_encoding != "none":
             if self.categorical_encoding == "one_hot":
-                # Sparse to dense
-                ohe = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
-                ohe_arr = ohe.fit_transform(df_work[cat_cols])
-                ohe_names = ohe.get_feature_names_out(cat_cols).tolist()
+                # Limit one-hot categories to prevent explosion on high-cardinality discrete categories
+                ohe = OneHotEncoder(sparse_output=False, handle_unknown="ignore", max_categories=15)
+                ohe_arr = ohe.fit_transform(df_work[discrete_cat_cols])
+                ohe_names = ohe.get_feature_names_out(discrete_cat_cols).tolist()
                 encoded_arrays.append(ohe_arr)
                 encoded_column_names.extend(ohe_names)
             elif self.categorical_encoding == "ordinal":
                 oe = OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=-1)
-                oe_arr = oe.fit_transform(df_work[cat_cols])
+                oe_arr = oe.fit_transform(df_work[discrete_cat_cols])
                 encoded_arrays.append(oe_arr)
-                encoded_column_names.extend(cat_cols)
-        elif cat_cols and self.categorical_encoding == "none":
-            # If no encoding selected for categorical columns, drop them to ensure numeric matrix for clustering
-            pass
+                encoded_column_names.extend(discrete_cat_cols)
 
         if not encoded_arrays:
             raise ValueError("No numeric features available for clustering after preprocessing.")

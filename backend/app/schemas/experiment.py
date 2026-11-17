@@ -57,9 +57,11 @@ class ExperimentMetrics(BaseModel):
 
 class VisualizationData(BaseModel):
     pca_2d: list[dict[str, Any]] # x, y, cluster, id
+    pca_3d: Optional[list[dict[str, Any]]] = None # x, y, z, cluster, id
     tsne_2d: Optional[list[dict[str, Any]]] = None
     cluster_distribution: list[dict[str, Any]] # cluster, count, percentage
     explained_variance_ratio: Optional[list[float]] = None
+    explained_variance_ratio_3d: Optional[list[float]] = None
     feature_importance_proxy: Optional[dict[str, float]] = None
 
 class ExperimentResponse(BaseModel):

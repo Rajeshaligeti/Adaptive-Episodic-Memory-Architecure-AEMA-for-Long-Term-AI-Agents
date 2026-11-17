@@ -141,11 +141,21 @@ export interface PCA2DPoint {
   cluster: number;
 }
 
+export interface PCA3DPoint {
+  id: number;
+  x: number;
+  y: number;
+  z: number;
+  cluster: number;
+}
+
 export interface VisualizationData {
   pca_2d: PCA2DPoint[];
+  pca_3d?: PCA3DPoint[] | null;
   tsne_2d?: PCA2DPoint[] | null;
   cluster_distribution: ClusterDistribution[];
   explained_variance_ratio?: number[];
+  explained_variance_ratio_3d?: number[];
   feature_importance_proxy?: Record<string, number>;
 }
 

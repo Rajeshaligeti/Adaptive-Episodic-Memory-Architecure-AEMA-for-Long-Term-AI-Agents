@@ -11,7 +11,7 @@ class Settings(BaseModel):
     PROJECT_NAME: str = "AEMA LAB"
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api"
-    DESCRIPTION: str = "Adaptive Ensemble Intelligence for Advanced Data Clustering"
+    DESCRIPTION: str = "Adaptive Episodic Memory Architecture"
     
     # Storage
     BASE_DIR: Path = BASE_DIR

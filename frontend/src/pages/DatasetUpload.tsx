@@ -29,6 +29,7 @@ export const DatasetUpload: React.FC<DatasetUploadProps> = ({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<DatasetPreview | null>(null);
+  const [loadingBenchmarkKey, setLoadingBenchmarkKey] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = async (file: File) => {
@@ -62,16 +63,16 @@ export const DatasetUpload: React.FC<DatasetUploadProps> = ({
 
   const loadBenchmark = async (sampleKey: string) => {
     setError(null);
-    setUploading(true);
+    setLoadingBenchmarkKey(sampleKey);
     try {
       const ds = await api.loadSampleDataset(sampleKey);
       onDatasetLoaded(ds);
       const prev = await api.getDatasetPreview(ds.id, 10);
       setPreview(prev);
     } catch (err: any) {
-      setError(err.message || 'Failed to load sample dataset.');
+      setError(err.message || 'Failed to load sample dataset. Please make sure the backend server is running on port 8000.');
     } finally {
-      setUploading(false);
+      setLoadingBenchmarkKey(null);
     }
   };
 
@@ -146,10 +147,16 @@ export const DatasetUpload: React.FC<DatasetUploadProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-1">
           <div
             onClick={() => loadBenchmark('aema_corpus')}
-            className="p-4 rounded-xl border border-blue-200 bg-blue-50/40 hover:bg-blue-50 hover:border-blue-400 cursor-pointer transition space-y-1.5"
+            className={`p-4 rounded-xl border cursor-pointer transition space-y-1.5 ${
+              loadingBenchmarkKey === 'aema_corpus'
+                ? 'border-blue-500 bg-blue-100/60 animate-pulse'
+                : 'border-blue-200 bg-blue-50/40 hover:bg-blue-50 hover:border-blue-400'
+            }`}
           >
             <div className="flex items-center justify-between">
-              <span className="font-bold text-blue-900 text-xs">AEMA Research Corpus</span>
+              <span className="font-bold text-blue-900 text-xs">
+                {loadingBenchmarkKey === 'aema_corpus' ? 'Loading AEMA Corpus...' : 'AEMA Research Corpus'}
+              </span>
               <span className="text-[10px] font-bold text-blue-700 bg-blue-200/60 px-1.5 py-0.5 rounded">ICSCNA 2026</span>
             </div>
             <p className="text-[11px] text-slate-600">800 synthetic fact memories with importance, protection, age, and retrieval counts.</p>
@@ -157,10 +164,16 @@ export const DatasetUpload: React.FC<DatasetUploadProps> = ({
 
           <div
             onClick={() => loadBenchmark('iris')}
-            className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-slate-100/80 hover:border-slate-300 cursor-pointer transition space-y-1.5"
+            className={`p-4 rounded-xl border cursor-pointer transition space-y-1.5 ${
+              loadingBenchmarkKey === 'iris'
+                ? 'border-blue-500 bg-blue-50 animate-pulse'
+                : 'border-slate-200 bg-slate-50/60 hover:bg-slate-100/80 hover:border-slate-300'
+            }`}
           >
             <div className="flex items-center justify-between">
-              <span className="font-bold text-slate-800 text-xs">Fisher's Iris Benchmark</span>
+              <span className="font-bold text-slate-800 text-xs">
+                {loadingBenchmarkKey === 'iris' ? 'Loading Iris...' : "Fisher's Iris Benchmark"}
+              </span>
               <span className="text-[10px] text-slate-500">150 rows</span>
             </div>
             <p className="text-[11px] text-slate-600">4 features (sepal & petal dimensions), 3 balanced classes with ground truth.</p>
@@ -168,10 +181,16 @@ export const DatasetUpload: React.FC<DatasetUploadProps> = ({
 
           <div
             onClick={() => loadBenchmark('customer_segmentation')}
-            className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-slate-100/80 hover:border-slate-300 cursor-pointer transition space-y-1.5"
+            className={`p-4 rounded-xl border cursor-pointer transition space-y-1.5 ${
+              loadingBenchmarkKey === 'customer_segmentation'
+                ? 'border-blue-500 bg-blue-50 animate-pulse'
+                : 'border-slate-200 bg-slate-50/60 hover:bg-slate-100/80 hover:border-slate-300'
+            }`}
           >
             <div className="flex items-center justify-between">
-              <span className="font-bold text-slate-800 text-xs">Customer Segmentation</span>
+              <span className="font-bold text-slate-800 text-xs">
+                {loadingBenchmarkKey === 'customer_segmentation' ? 'Loading Customer Data...' : 'Customer Segmentation'}
+              </span>
               <span className="text-[10px] text-slate-500">200 rows</span>
             </div>
             <p className="text-[11px] text-slate-600">Mall customer profiles: age, annual income, spending score, and categorical gender.</p>
@@ -179,10 +198,16 @@ export const DatasetUpload: React.FC<DatasetUploadProps> = ({
 
           <div
             onClick={() => loadBenchmark('wine')}
-            className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-slate-100/80 hover:border-slate-300 cursor-pointer transition space-y-1.5"
+            className={`p-4 rounded-xl border cursor-pointer transition space-y-1.5 ${
+              loadingBenchmarkKey === 'wine'
+                ? 'border-blue-500 bg-blue-50 animate-pulse'
+                : 'border-slate-200 bg-slate-50/60 hover:bg-slate-100/80 hover:border-slate-300'
+            }`}
           >
             <div className="flex items-center justify-between">
-              <span className="font-bold text-slate-800 text-xs">Wine Chemical Dataset</span>
+              <span className="font-bold text-slate-800 text-xs">
+                {loadingBenchmarkKey === 'wine' ? 'Loading Wine Data...' : 'Wine Chemical Dataset'}
+              </span>
               <span className="text-[10px] text-slate-500">178 rows</span>
             </div>
             <p className="text-[11px] text-slate-600">13 continuous chemical constituents (alcohol, malic acid, flavonoids) for high-D clustering.</p>
@@ -190,10 +215,16 @@ export const DatasetUpload: React.FC<DatasetUploadProps> = ({
 
           <div
             onClick={() => loadBenchmark('synthetic_moons')}
-            className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-slate-100/80 hover:border-slate-300 cursor-pointer transition space-y-1.5"
+            className={`p-4 rounded-xl border cursor-pointer transition space-y-1.5 ${
+              loadingBenchmarkKey === 'synthetic_moons'
+                ? 'border-blue-500 bg-blue-50 animate-pulse'
+                : 'border-slate-200 bg-slate-50/60 hover:bg-slate-100/80 hover:border-slate-300'
+            }`}
           >
             <div className="flex items-center justify-between">
-              <span className="font-bold text-slate-800 text-xs">Non-Convex Moons</span>
+              <span className="font-bold text-slate-800 text-xs">
+                {loadingBenchmarkKey === 'synthetic_moons' ? 'Loading Moons...' : 'Non-Convex Moons'}
+              </span>
               <span className="text-[10px] text-slate-500">300 rows</span>
             </div>
             <p className="text-[11px] text-slate-600">Interlocking non-linear geometric crescents to test non-spherical cluster detection.</p>

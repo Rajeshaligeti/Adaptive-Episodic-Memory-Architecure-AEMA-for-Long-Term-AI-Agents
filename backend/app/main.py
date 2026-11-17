@@ -40,7 +40,7 @@ def root_endpoint():
         "app": settings.PROJECT_NAME,
         "version": settings.VERSION,
         "status": "online",
-        "tagline": "Adaptive Ensemble Intelligence for Advanced Data Clustering",
+        "tagline": "Adaptive Episodic Memory Architecture",
         "documentation": "/docs"
     }
 

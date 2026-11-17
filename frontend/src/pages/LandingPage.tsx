@@ -34,11 +34,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onLoadSamp
           </div>
 
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
-            Adaptive Ensemble Intelligence for Advanced Data Clustering
+            Adaptive Episodic Memory Architecture
           </h1>
 
           <p className="text-slate-300 text-sm md:text-base leading-relaxed">
-            <strong>AEMA LAB</strong> provides an adaptive ensemble-based machine learning pipeline that
+            <strong>AEMA LAB</strong> provides an adaptive episodic memory and machine learning clustering pipeline that
             dynamically weights base clustering partitions, computes consensus co-association matrices,
             and applies cognitive sample confidence scoring to discover robust data structures.
           </p>

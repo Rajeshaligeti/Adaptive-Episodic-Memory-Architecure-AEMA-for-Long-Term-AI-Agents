@@ -6,10 +6,13 @@ import {
   Sparkles,
   HelpCircle,
   Eye,
-  FileText
+  FileText,
+  Box,
+  Compass
 } from 'lucide-react';
 import { Experiment } from '../types';
 import { PcaScatterChart } from '../charts/PcaScatterChart';
+import { Pca3DScatterChart } from '../charts/Pca3DScatterChart';
 import { ClusterDistributionChart } from '../charts/ClusterDistributionChart';
 import { ActivePage } from '../components/Sidebar';
 
@@ -22,14 +25,14 @@ export const VisualizationsPage: React.FC<VisualizationsPageProps> = ({
   experiment,
   onNavigate
 }) => {
-  const [viewMode, setViewMode] = useState<'pca' | 'tsne'>('pca');
+  const [viewMode, setViewMode] = useState<'3d' | 'pca' | 'tsne'>('3d');
 
   if (!experiment) {
     return (
       <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-xl mx-auto space-y-4">
         <PieChart className="w-12 h-12 text-slate-300 mx-auto" />
         <h3 className="text-base font-bold text-slate-800">No Visualization Data Available</h3>
-        <p className="text-xs text-slate-500">Run an experiment first to generate 2D PCA projections and cluster distributions.</p>
+        <p className="text-xs text-slate-500">Run an experiment first to generate 2D/3D PCA projections and cluster distributions.</p>
         <button
           onClick={() => onNavigate('experiment')}
           className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition"
@@ -40,8 +43,9 @@ export const VisualizationsPage: React.FC<VisualizationsPageProps> = ({
     );
   }
 
-  const vis = experiment.visualizations;
-  const hasTsne = vis.tsne_2d && vis.tsne_2d.length > 0;
+  const vis = experiment.visualizations || { pca_2d: [], cluster_distribution: [] };
+  const hasTsne = Boolean(vis.tsne_2d && vis.tsne_2d.length > 0);
+  const points3D = vis.pca_3d && vis.pca_3d.length > 0 ? vis.pca_3d : vis.pca_2d;
   const currentPoints = viewMode === 'tsne' && hasTsne ? vis.tsne_2d! : vis.pca_2d;
 
   return (
@@ -53,7 +57,7 @@ export const VisualizationsPage: React.FC<VisualizationsPageProps> = ({
             High-Dimensional Coordinate Projection
           </span>
           <h2 className="text-xl font-bold text-slate-900 mt-1">
-            {experiment.algorithm_name} Manifold & Scatter Analysis
+            {experiment.algorithm_name} Manifold & 2D / 3D Analysis
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
             Plotted from actual transformed features and real cluster assignments (no synthetic mock coordinates).
@@ -61,7 +65,18 @@ export const VisualizationsPage: React.FC<VisualizationsPageProps> = ({
         </div>
 
         {/* View Mode Toggle */}
-        <div className="flex items-center space-x-2 bg-slate-100 p-1 rounded-xl self-start md:self-auto">
+        <div className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl self-start md:self-auto">
+          <button
+            onClick={() => setViewMode('3d')}
+            className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+              viewMode === '3d'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Box className="w-3.5 h-3.5" />
+            <span>3D Interactive PCA</span>
+          </button>
           <button
             onClick={() => setViewMode('pca')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
@@ -70,7 +85,7 @@ export const VisualizationsPage: React.FC<VisualizationsPageProps> = ({
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            2D PCA Projection
+            2D PCA
           </button>
           <button
             disabled={!hasTsne}
@@ -81,22 +96,29 @@ export const VisualizationsPage: React.FC<VisualizationsPageProps> = ({
                 : 'text-slate-600 hover:text-slate-900'
             } disabled:opacity-40 disabled:cursor-not-allowed`}
           >
-            2D t-SNE Manifold
+            2D t-SNE
           </button>
         </div>
       </div>
 
-      {/* Main Scatter Plot */}
-      <PcaScatterChart
-        data={currentPoints}
-        title={viewMode === 'pca' ? '2D Principal Component Projection (PCA)' : '2D t-SNE Non-Linear Manifold'}
-        subtitle={
-          viewMode === 'pca'
-            ? 'Dimensionality reduced via orthogonal linear combinations maximizing global variance'
-            : 'Preserves local neighborhood topologies and non-linear cluster separation'
-        }
-        explainedVariance={viewMode === 'pca' ? vis.explained_variance_ratio : undefined}
-      />
+      {/* Main Scatter Plot Display */}
+      {viewMode === '3d' ? (
+        <Pca3DScatterChart
+          data={points3D}
+          explainedVariance={vis.explained_variance_ratio_3d || vis.explained_variance_ratio}
+        />
+      ) : (
+        <PcaScatterChart
+          data={currentPoints}
+          title={viewMode === 'pca' ? '2D Principal Component Projection (PCA)' : '2D t-SNE Non-Linear Manifold'}
+          subtitle={
+            viewMode === 'pca'
+              ? 'Dimensionality reduced via orthogonal linear combinations maximizing global variance'
+              : 'Preserves local neighborhood topologies and non-linear cluster separation'
+          }
+          explainedVariance={viewMode === 'pca' ? vis.explained_variance_ratio : undefined}
+        />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Cluster Size Distribution */}

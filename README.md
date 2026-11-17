@@ -1,4 +1,4 @@
-# AEMA LAB — Adaptive Ensemble Intelligence for Advanced Data Clustering
+# AEMA LAB — Adaptive Episodic Memory Architecture
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev)
@@ -8,7 +8,7 @@
 [![Vitest](https://img.shields.io/badge/Vitest-2.1-729B1B?logo=vitest&logoColor=white)](https://vitest.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A production-quality machine learning web application implementing the **Adaptive Ensemble-based Machine Learning Approach (AEMA)** for data clustering, high-dimensional projection, and algorithmic benchmarking.
+A production-quality machine learning web application implementing the **Adaptive Episodic Memory Architecture (AEMA)** for data clustering, high-dimensional 2D & 3D projection, and algorithmic benchmarking.
 
 Developed based on peer-reviewed research:
 > **"Adaptive Episodic Memory Architecture (AEMA) for Long-Term AI Agents"**  
@@ -39,9 +39,10 @@ Developed based on peer-reviewed research:
   - Automated highlighting of top-performing algorithms across Silhouette, Davies-Bouldin, and Calinski-Harabasz metrics.
 
 - **Scientific Visualizations**:
+  - Interactive **3D Orbital PCA Projections** with real-time 360° mouse rotation, zoom controls, 3D coordinate bounding boxes, and node inspection.
   - Interactive 2D Principal Component Analysis (PCA) projection with cluster-coded color palettes and explained variance ratios.
-  - 2D t-SNE manifold projections.
-  - Cluster size and percentage distribution bar charts.
+  - 2D t-SNE non-linear manifold projections.
+  - Cluster size and percentage distribution bar charts with summary breakdown statistics.
   - Multi-metric benchmark comparative bar charts.
 
 - **Publication-Ready Outputs**:
